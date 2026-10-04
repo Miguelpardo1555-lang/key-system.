@@ -1,6 +1,117 @@
-⚡ EXOTIC XIT ⚡
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#050607">
+<title>EXOTIC XIT KEY</title>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;min-height:100vh;background:#050607;color:#fff;
+ font-family:Arial,Helvetica,sans-serif;display:flex;align-items:center;justify-content:center;
+}
+.card{
+ width:calc(100% - 42px);max-width:745px;padding:55px 60px 45px;
+ background:#0c1010;border:4px solid #00f5bd;border-radius:30px;
+ box-shadow:0 0 18px #00f5bd,0 0 45px rgba(0,245,189,.35);
+ text-align:center;
+}
+h1{
+ margin:0 0 25px;color:#00f5bd;font-size:46px;letter-spacing:4px;
+ text-shadow:0 0 12px #00f5bd;font-weight:900;
+}
+.sub{font-size:25px;color:#aaa;line-height:1.35;margin-bottom:40px}
+.key{
+ border:2px dashed #00f5bd;border-radius:14px;padding:22px 12px;
+ font-size:38px;font-weight:900;letter-spacing:5px;
+ text-shadow:0 0 12px #fff;word-break:break-all;
+ margin-bottom:25px;
+}
+button{
+ width:100%;padding:20px;border-radius:15px;background:#0c1010;
+ color:#00f5bd;border:4px solid #00f5bd;font-size:27px;
+ font-weight:900;letter-spacing:2px;box-shadow:0 0 18px rgba(0,245,189,.55);
+}
+.timer{margin-top:28px;color:#aaa;font-size:20px}
+.timer strong{display:block;color:#00f5bd;font-size:32px;margin-top:7px;text-shadow:0 0 10px #00f5bd}
+.bar{height:9px;background:#202626;border-radius:20px;margin-top:15px;overflow:hidden}
+.fill{height:100%;width:100%;background:#00f5bd;box-shadow:0 0 12px #00f5bd}
+@media(max-width:600px){
+ .card{padding:42px 22px 35px;width:calc(100% - 38px)}
+ h1{font-size:34px;letter-spacing:3px}
+ .sub{font-size:20px;margin-bottom:30px}
+ .key{font-size:27px;letter-spacing:3px;padding:19px 8px}
+ button{font-size:21px;padding:17px}
+ .timer{font-size:17px}.timer strong{font-size:27px}
+}
+</style>
+</head>
+<body>
+<div class="card">
+ <h1>⚡ EXOTIC XIT ⚡</h1>
+ <div class="sub">Copia tu llave y úsala en el ejecutor Delta.</div>
 
-Copia tu llave y úsala en el ejecutor Delta.
-GENERANDO...
-COPIAR KEY
-Tiempo restante de la key: 24:00:00
+ <div class="key" id="key">GENERANDO...</div>
+
+ <button id="copy">COPIAR KEY</button>
+
+ <div class="timer">
+   Tiempo restante de la key:
+   <strong id="time">24:00:00</strong>
+   <div class="bar"><div class="fill" id="fill"></div></div>
+ </div>
+</div>
+
+<script>
+const KEY="exotic_xit_key";
+const EXP="exotic_xit_exp";
+const DAY=24*60*60*1000;
+
+function makeKey(){
+ const chars="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+ let s="";
+ for(let i=0;i<6;i++) s+=chars[Math.floor(Math.random()*chars.length)];
+ return "EX-"+s;
+}
+
+let key=localStorage.getItem(KEY);
+let exp=Number(localStorage.getItem(EXP)||0);
+
+if(!key || !exp || Date.now()>=exp){
+ key=makeKey();
+ exp=Date.now()+DAY;
+ localStorage.setItem(KEY,key);
+ localStorage.setItem(EXP,exp);
+}
+
+document.getElementById("key").textContent=key;
+
+document.getElementById("copy").onclick=async()=>{
+ try{
+  await navigator.clipboard.writeText(key);
+  document.getElementById("copy").textContent="✓ KEY COPIADA";
+  setTimeout(()=>document.getElementById("copy").textContent="COPIAR KEY",1600);
+ }catch(e){}
+};
+
+function update(){
+ let left=Math.max(0,exp-Date.now());
+ let total=DAY;
+ let h=Math.floor(left/3600000);
+ let m=Math.floor((left%3600000)/60000);
+ let s=Math.floor((left%60000)/1000);
+ document.getElementById("time").textContent=
+  String(h).padStart(2,"0")+":"+String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");
+ document.getElementById("fill").style.width=(left/total*100)+"%";
+ if(left<=0){
+  key=makeKey(); exp=Date.now()+DAY;
+  localStorage.setItem(KEY,key);localStorage.setItem(EXP,exp);
+  document.getElementById("key").textContent=key;
+ }
+}
+update();
+setInterval(update,1000);
+</script>
+</body>
+</html>
