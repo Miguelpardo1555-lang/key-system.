@@ -1,45 +1,94 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#050607">
-<title>EXOTIC XIT KEY</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZRUSSO KEY</title>
 <style>
-html,body{margin:0;min-height:100%;background:#050607}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:#fff;display:flex;justify-content:center;align-items:center;min-height:100vh}
 *{box-sizing:border-box}
-.card{width:calc(100% - 34px);max-width:740px;background:#0c1010;border:4px solid #00f5bd;border-radius:30px;padding:48px 24px 34px;text-align:center;box-shadow:0 0 18px #00f5bd,0 0 50px rgba(0,245,189,.3)}
-h1{margin:0 0 20px;color:#00f5bd;font-size:38px;letter-spacing:3px;font-weight:900;text-shadow:0 0 12px #00f5bd}
-.sub{color:#aaa;font-size:19px;line-height:1.35;margin:0 auto 30px;max-width:560px}
-.key{min-height:72px;display:flex;align-items:center;justify-content:center;border:2px dashed #00f5bd;border-radius:14px;background:#111717;color:#fff;font-size:30px;font-weight:900;letter-spacing:4px;text-shadow:0 0 12px #fff;word-break:break-all;padding:15px 10px}
-button{width:100%;margin-top:22px;padding:17px;border-radius:15px;border:3px solid #00f5bd;background:#0c1010;color:#00f5bd;font-size:21px;font-weight:900;letter-spacing:1px;box-shadow:0 0 18px rgba(0,245,189,.5)}
-.timer{margin-top:24px;color:#999;font-size:16px}
-#time{display:block;color:#00f5bd;font-size:30px;font-weight:900;margin-top:6px;text-shadow:0 0 10px #00f5bd}
-.bar{height:9px;background:#202626;border-radius:20px;margin-top:13px;overflow:hidden}
-#fill{height:100%;width:100%;background:#00f5bd;box-shadow:0 0 12px #00f5bd}
-@media(max-width:430px){.card{padding:38px 18px 30px}h1{font-size:30px}.sub{font-size:17px}.key{font-size:24px;letter-spacing:3px}button{font-size:19px}}
+html,body{margin:0;min-height:100%;background:#050607}
+body{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  padding:20px;font-family:Arial,Helvetica,sans-serif;color:#fff
+}
+.card{
+  width:100%;max-width:745px;background:#0c1010;
+  border:4px solid #00f5bd;border-radius:30px;
+  padding:55px 60px 45px;text-align:center;
+  box-shadow:0 0 18px #00f5bd,0 0 45px rgba(0,245,189,.35)
+}
+h1{
+  margin:0 0 25px;color:#00f5bd;font-size:46px;
+  letter-spacing:4px;font-weight:900;text-shadow:0 0 12px #00f5bd
+}
+.sub{
+  margin:0 auto 42px;max-width:560px;color:#aaa;
+  font-size:25px;line-height:1.35
+}
+.key{
+  padding:22px 12px;border:2px dashed #00f5bd;border-radius:14px;
+  background:#111717;color:#fff;font-size:38px;font-weight:900;
+  letter-spacing:5px;text-shadow:0 0 12px #fff;word-break:break-all
+}
+button{
+  width:100%;margin-top:25px;padding:20px;border-radius:15px;
+  background:#0c1010;color:#00f5bd;border:4px solid #00f5bd;
+  font-size:27px;font-weight:900;letter-spacing:2px;
+  box-shadow:0 0 18px rgba(0,245,189,.55)
+}
+.note{margin-top:30px;color:#555;font-size:20px}
+@media(max-width:600px){
+  .card{padding:45px 22px 35px}
+  h1{font-size:34px;letter-spacing:3px}
+  .sub{font-size:20px;margin-bottom:32px}
+  .key{font-size:27px;letter-spacing:3px}
+  button{font-size:21px;padding:17px}
+  .note{font-size:17px}
+}
 </style>
 </head>
 <body>
 <div class="card">
-<h1>⚡ EXOTIC XIT ⚡</h1>
-<p class="sub">Copia tu llave y úsala en el ejecutor Delta.</p>
-<div class="key" id="key">GENERANDO...</div>
-<button id="copy">COPIAR KEY</button>
-<div class="timer">Tiempo restante de la key:<span id="time">24:00:00</span><div class="bar"><div id="fill"></div></div></div>
+  <h1>⚡ ZRUSSO KEY ⚡</h1>
+  <p class="sub">Copia tu llave diaria e ingrésala en el ejecutor Delta.</p>
+  <div class="key" id="key">GENERANDO...</div>
+  <button id="copy">COPIAR KEY</button>
+  <div class="note">La llave cambia a la medianoche.</div>
 </div>
+
 <script>
-(function(){
-const DAY=86400000,K="exotic_xit_key",E="exotic_xit_exp";
-function newKey(){const c="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";let s="";for(let i=0;i<6;i++)s+=c[Math.floor(Math.random()*c.length)];return"EX-"+s}
-let key=localStorage.getItem(K),exp=Number(localStorage.getItem(E)||0);
-if(!key||!exp||Date.now()>=exp){key=newKey();exp=Date.now()+DAY;localStorage.setItem(K,key);localStorage.setItem(E,exp)}
+const KEY_NAME="zr_key";
+
+function generateKey(){
+  const chars="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let s="";
+  for(let i=0;i<6;i++) s+=chars[Math.floor(Math.random()*chars.length)];
+  return "ZR-"+s;
+}
+
+let key=localStorage.getItem(KEY_NAME);
+const today=new Date().toDateString();
+const savedDay=localStorage.getItem(KEY_NAME+"_day");
+
+if(!key || savedDay!==today){
+  key=generateKey();
+  localStorage.setItem(KEY_NAME,key);
+  localStorage.setItem(KEY_NAME+"_day",today);
+}
+
 document.getElementById("key").textContent=key;
-document.getElementById("copy").onclick=async function(){try{await navigator.clipboard.writeText(key)}catch(e){let t=document.createElement("textarea");t.value=key;document.body.appendChild(t);t.select();document.execCommand("copy");t.remove()}this.textContent="✓ KEY COPIADA";setTimeout(()=>this.textContent="COPIAR KEY",1600)};
-function tick(){let x=Math.max(0,exp-Date.now());let h=Math.floor(x/3600000),m=Math.floor(x%3600000/60000),s=Math.floor(x%60000/1000);document.getElementById("time").textContent=String(h).padStart(2,"0")+":"+String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");document.getElementById("fill").style.width=(x/DAY*100)+"%"}
-tick();setInterval(tick,1000);
-})();
+
+document.getElementById("copy").addEventListener("click",async function(){
+  try{
+    await navigator.clipboard.writeText(key);
+  }catch(e){
+    const t=document.createElement("textarea");
+    t.value=key;document.body.appendChild(t);t.select();
+    document.execCommand("copy");t.remove();
+  }
+  this.textContent="✓ KEY COPIADA";
+  setTimeout(()=>this.textContent="COPIAR KEY",1600);
+});
 </script>
 </body>
 </html>
