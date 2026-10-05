@@ -26,10 +26,8 @@
       width: min(92%, 430px);
       padding: 32px 22px;
       text-align: center;
-
       border: 2px solid #00f5d4;
       border-radius: 18px;
-
       box-shadow:
         0 0 18px #00f5d4,
         inset 0 0 18px rgba(0,245,212,.12);
@@ -37,12 +35,9 @@
 
     h1 {
       margin: 0 0 22px;
-
       color: #00f5d4;
       font-size: 28px;
-
-      text-shadow:
-        0 0 12px #00f5d4;
+      text-shadow: 0 0 12px #00f5d4;
     }
 
     .loading {
@@ -53,47 +48,34 @@
 
     .key {
       display: none;
-
       padding: 14px 18px;
       margin-bottom: 15px;
-
       border-radius: 10px;
-
       background: #111;
       border: 1px solid #00f5d4;
-
       color: #fff;
       font-size: 22px;
       font-weight: bold;
-
       letter-spacing: 2px;
       user-select: all;
     }
 
     .copy {
       display: none;
-
       width: 100%;
       padding: 13px;
-
       border: none;
       border-radius: 10px;
-
       background: #00f5d4;
       color: #001411;
-
       font-size: 16px;
       font-weight: bold;
-
       cursor: pointer;
-
-      box-shadow:
-        0 0 14px rgba(0,245,212,.55);
+      box-shadow: 0 0 14px rgba(0,245,212,.55);
     }
 
     .status {
       margin-top: 15px;
-
       color: #aaa;
       font-size: 14px;
     }
@@ -111,7 +93,7 @@
     <h1>⚡ ZRUSSO KEY ⚡</h1>
 
     <div class="loading" id="loading">
-      Generando tu key...
+      Verificando Linkvertise...
     </div>
 
     <div class="key" id="key"></div>
@@ -124,13 +106,10 @@
 
   </main>
 
-
   <script>
 
-    // API DE ZRUSSO
     const API_URL =
-      "https://zrusso-key-api.miguelpardo1555.workers.dev/generate";
-
+      "https://zrusso-key-api.miguelpardo1555.workers.dev/issue";
 
     const loading = document.getElementById("loading");
     const keyElement = document.getElementById("key");
@@ -138,22 +117,46 @@
     const status = document.getElementById("status");
 
 
-    // SOLICITAR UNA KEY AL SERVIDOR
-    async function generateKey() {
+    async function getKey() {
 
       try {
 
-        const response = await fetch(API_URL);
+        // Obtener hash que entrega Linkvertise
+        const params = new URLSearchParams(window.location.search);
+        const hash = params.get("hash");
 
-        if (!response.ok) {
-          throw new Error("Error HTTP " + response.status);
+        if (!hash) {
+
+          loading.textContent =
+            "No se encontró la verificación de Linkvertise.";
+
+          loading.classList.add("error");
+
+          status.textContent =
+            "Completa el proceso desde el botón OBTENER KEY.";
+
+          return;
         }
+
+
+        loading.textContent =
+          "Verificando acceso...";
+
+
+        const response = await fetch(
+          API_URL + "?hash=" + encodeURIComponent(hash)
+        );
+
 
         const data = await response.json();
 
 
-        if (!data.success || !data.key) {
-          throw new Error("La API no devolvió una key.");
+        if (!response.ok || !data.success || !data.key) {
+
+          throw new Error(
+            data.error || "No se pudo generar la key."
+          );
+
         }
 
 
@@ -161,12 +164,13 @@
         keyElement.textContent = data.key;
 
         loading.style.display = "none";
+
         keyElement.style.display = "inline-block";
+
         copyButton.style.display = "block";
 
         status.textContent =
-          "Tu key es válida durante 24 horas.";
-
+          "✓ Key válida durante 24 horas.";
 
       } catch (error) {
 
@@ -176,10 +180,12 @@
         loading.classList.add("error");
 
         status.textContent =
-          "Intenta nuevamente en unos segundos.";
+          error.message || "Intenta nuevamente.";
 
         console.error(error);
+
       }
+
     }
 
 
@@ -192,18 +198,13 @@
 
         await navigator.clipboard.writeText(key);
 
-        copyButton.textContent = "✓ KEY COPIADA";
-
-        setTimeout(function () {
-          copyButton.textContent = "COPIAR KEY";
-        }, 2000);
-
       } catch (error) {
 
-        // Alternativa para navegadores que no permiten clipboard
-        const textArea = document.createElement("textarea");
+        const textArea =
+          document.createElement("textarea");
 
         textArea.value = key;
+
         document.body.appendChild(textArea);
 
         textArea.select();
@@ -212,18 +213,19 @@
 
         textArea.remove();
 
-        copyButton.textContent = "✓ KEY COPIADA";
-
-        setTimeout(function () {
-          copyButton.textContent = "COPIAR KEY";
-        }, 2000);
       }
+
+      copyButton.textContent = "✓ KEY COPIADA";
+
+      setTimeout(function () {
+        copyButton.textContent = "COPIAR KEY";
+      }, 2000);
 
     });
 
 
     // INICIAR
-    generateKey();
+    getKey();
 
   </script>
 
