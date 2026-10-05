@@ -28,6 +28,7 @@
       text-align: center;
       border: 2px solid #00f5d4;
       border-radius: 18px;
+
       box-shadow:
         0 0 18px #00f5d4,
         inset 0 0 18px rgba(0,245,212,.12);
@@ -74,14 +75,35 @@
       box-shadow: 0 0 14px rgba(0,245,212,.55);
     }
 
+    .copy:active {
+      transform: scale(0.98);
+    }
+
     .status {
       margin-top: 15px;
       color: #aaa;
       font-size: 14px;
+      line-height: 1.5;
+      word-break: break-word;
     }
 
     .error {
       color: #ff5555;
+    }
+
+    .debug {
+      margin-top: 18px;
+      padding: 12px;
+      background: #111;
+      border: 1px solid #333;
+      border-radius: 8px;
+      color: #ffcc66;
+      font-size: 12px;
+      text-align: left;
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 220px;
+      overflow-y: auto;
     }
   </style>
 </head>
@@ -99,10 +121,14 @@
     <div class="key" id="key"></div>
 
     <button class="copy" id="copy">
-      COPIAR KEY
+      📋 COPIAR KEY
     </button>
 
     <div class="status" id="status"></div>
+
+    <div class="debug" id="debug">
+      Esperando respuesta...
+    </div>
 
   </main>
 
@@ -111,19 +137,37 @@
     const API_URL =
       "https://zrusso-key-api.miguelpardo1555.workers.dev/issue";
 
-    const loading = document.getElementById("loading");
-    const keyElement = document.getElementById("key");
-    const copyButton = document.getElementById("copy");
-    const status = document.getElementById("status");
+    const loading =
+      document.getElementById("loading");
+
+    const keyElement =
+      document.getElementById("key");
+
+    const copyButton =
+      document.getElementById("copy");
+
+    const status =
+      document.getElementById("status");
+
+    const debug =
+      document.getElementById("debug");
 
 
     async function getKey() {
 
       try {
 
-        // Obtener hash que entrega Linkvertise
-        const params = new URLSearchParams(window.location.search);
-        const hash = params.get("hash");
+        const params =
+          new URLSearchParams(window.location.search);
+
+        const hash =
+          params.get("hash");
+
+
+        debug.textContent =
+          "Hash recibido:\n" +
+          (hash ? hash : "NO SE RECIBIÓ HASH");
+
 
         if (!hash) {
 
@@ -135,6 +179,10 @@
           status.textContent =
             "Completa el proceso desde el botón OBTENER KEY.";
 
+          debug.textContent +=
+            "\n\nURL actual:\n" +
+            window.location.href;
+
           return;
         }
 
@@ -143,36 +191,79 @@
           "Verificando acceso...";
 
 
-        const response = await fetch(
-          API_URL + "?hash=" + encodeURIComponent(hash)
-        );
+        const response =
+          await fetch(
+            API_URL +
+            "?hash=" +
+            encodeURIComponent(hash)
+          );
 
 
-        const data = await response.json();
+        const responseText =
+          await response.text();
 
 
-        if (!response.ok || !data.success || !data.key) {
+        debug.textContent =
+          "Hash recibido:\n" +
+          hash +
+          "\n\n" +
+
+          "HTTP STATUS:\n" +
+          response.status +
+          "\n\n" +
+
+          "RESPUESTA EXACTA DEL WORKER:\n" +
+          responseText;
+
+
+        let data;
+
+        try {
+
+          data =
+            JSON.parse(responseText);
+
+        } catch (jsonError) {
 
           throw new Error(
-            data.error || "No se pudo generar la key."
+            "El Worker respondió algo que no es JSON."
           );
 
         }
 
 
-        // Mostrar key
-        keyElement.textContent = data.key;
+        if (
+          !response.ok ||
+          !data.success ||
+          !data.key
+        ) {
 
-        loading.style.display = "none";
+          throw new Error(
+            data.error ||
+            "No se pudo generar la key."
+          );
 
-        keyElement.style.display = "inline-block";
+        }
 
-        copyButton.style.display = "block";
+
+        keyElement.textContent =
+          data.key;
+
+        loading.style.display =
+          "none";
+
+        keyElement.style.display =
+          "block";
+
+        copyButton.style.display =
+          "block";
 
         status.textContent =
           "✓ Key válida durante 24 horas.";
 
-      } catch (error) {
+      }
+
+      catch (error) {
 
         loading.textContent =
           "No se pudo generar la key.";
@@ -180,7 +271,8 @@
         loading.classList.add("error");
 
         status.textContent =
-          error.message || "Intenta nuevamente.";
+          error.message ||
+          "Intenta nuevamente.";
 
         console.error(error);
 
@@ -190,41 +282,54 @@
 
 
     // COPIAR KEY
-    copyButton.addEventListener("click", async function () {
+    copyButton.addEventListener(
+      "click",
+      async function () {
 
-      const key = keyElement.textContent;
+        const key =
+          keyElement.textContent.trim();
 
-      try {
+        try {
 
-        await navigator.clipboard.writeText(key);
+          await navigator.clipboard.writeText(key);
 
-      } catch (error) {
+        } catch (error) {
 
-        const textArea =
-          document.createElement("textarea");
+          const textArea =
+            document.createElement("textarea");
 
-        textArea.value = key;
+          textArea.value = key;
 
-        document.body.appendChild(textArea);
+          textArea.style.position = "fixed";
+          textArea.style.left = "-9999px";
 
-        textArea.select();
+          document.body.appendChild(textArea);
 
-        document.execCommand("copy");
+          textArea.focus();
+          textArea.select();
 
-        textArea.remove();
+          document.execCommand("copy");
+
+          textArea.remove();
+        }
+
+        copyButton.textContent =
+          "✓ KEY COPIADA";
+
+        setTimeout(
+          function () {
+
+            copyButton.textContent =
+              "📋 COPIAR KEY";
+
+          },
+          2000
+        );
 
       }
-
-      copyButton.textContent = "✓ KEY COPIADA";
-
-      setTimeout(function () {
-        copyButton.textContent = "COPIAR KEY";
-      }, 2000);
-
-    });
+    );
 
 
-    // INICIAR
     getKey();
 
   </script>
