@@ -1,226 +1,231 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>ZRUSSO KEY</title>
+  <title>ZRUSSO KEY</title>
 
-<style>
-* {
-  box-sizing: border-box;
-}
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-body {
-  margin: 0;
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #050505;
-  font-family: Arial, sans-serif;
-  color: #fff;
-}
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #050505;
+      font-family: Arial, sans-serif;
+      color: #fff;
+    }
 
-.card {
-  width: min(92%, 430px);
-  padding: 32px 22px;
-  text-align: center;
+    .card {
+      width: min(92%, 430px);
+      padding: 32px 22px;
+      text-align: center;
 
-  border: 2px solid #00f5d4;
-  border-radius: 18px;
+      border: 2px solid #00f5d4;
+      border-radius: 18px;
 
-  box-shadow:
-    0 0 18px #00f5d4,
-    inset 0 0 18px rgba(0, 245, 212, 0.12);
-}
+      box-shadow:
+        0 0 18px #00f5d4,
+        inset 0 0 18px rgba(0,245,212,.12);
+    }
 
-h1 {
-  margin: 0 0 22px;
-  color: #00f5d4;
-  font-size: 28px;
+    h1 {
+      margin: 0 0 22px;
 
-  text-shadow:
-    0 0 12px #00f5d4;
-}
+      color: #00f5d4;
+      font-size: 28px;
 
-.key {
-  display: inline-block;
-  padding: 14px 18px;
-  margin-bottom: 14px;
+      text-shadow:
+        0 0 12px #00f5d4;
+    }
 
-  border-radius: 10px;
-  background: #111;
-  border: 1px solid #00f5d4;
+    .loading {
+      color: #aaa;
+      font-size: 15px;
+      margin-bottom: 18px;
+    }
 
-  color: #fff;
-  font-size: 22px;
-  font-weight: bold;
-  letter-spacing: 2px;
+    .key {
+      display: none;
 
-  user-select: all;
-}
+      padding: 14px 18px;
+      margin-bottom: 15px;
 
-button {
-  width: 100%;
-  padding: 14px 18px;
+      border-radius: 10px;
 
-  border: none;
-  border-radius: 10px;
+      background: #111;
+      border: 1px solid #00f5d4;
 
-  background: #00f5d4;
-  color: #001411;
+      color: #fff;
+      font-size: 22px;
+      font-weight: bold;
 
-  font-size: 16px;
-  font-weight: bold;
+      letter-spacing: 2px;
+      user-select: all;
+    }
 
-  cursor: pointer;
+    .copy {
+      display: none;
 
-  box-shadow:
-    0 0 14px rgba(0, 245, 212, 0.55);
-}
+      width: 100%;
+      padding: 13px;
 
-button:active {
-  transform: scale(0.98);
-}
+      border: none;
+      border-radius: 10px;
 
-p {
-  margin: 14px 0 0;
-  color: #aaa;
-  font-size: 14px;
-}
+      background: #00f5d4;
+      color: #001411;
 
-.note {
-  margin-top: 18px;
-  color: #777;
-  font-size: 12px;
-}
-</style>
+      font-size: 16px;
+      font-weight: bold;
+
+      cursor: pointer;
+
+      box-shadow:
+        0 0 14px rgba(0,245,212,.55);
+    }
+
+    .status {
+      margin-top: 15px;
+
+      color: #aaa;
+      font-size: 14px;
+    }
+
+    .error {
+      color: #ff5555;
+    }
+  </style>
 </head>
 
 <body>
 
-<main class="card">
+  <main class="card">
 
-  <h1>⚡ ZRUSSO KEY ⚡</h1>
+    <h1>⚡ ZRUSSO KEY ⚡</h1>
 
-  <div class="key" id="key">
-    ZR-XXXXXX
-  </div>
+    <div class="loading" id="loading">
+      Generando tu key...
+    </div>
 
-  <button id="copyKey">
-    COPIAR KEY
-  </button>
+    <div class="key" id="key"></div>
 
-  <p>
-    Tu key está disponible durante el día.
-  </p>
+    <button class="copy" id="copy">
+      COPIAR KEY
+    </button>
 
-  <div class="note">
-    La key cambia automáticamente cada día.
-  </div>
+    <div class="status" id="status"></div>
 
-</main>
-
-<script>
-
-const PREFIX = "ZR-";
-const STORAGE_NAME = "zrusso_daily_key";
-
-// Fecha local del dispositivo: YYYY-MM-DD
-function getToday() {
-  const now = new Date();
-
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, "0");
-  const day = String(now.getDate()).padStart(2, "0");
-
-  return `${year}-${month}-${day}`;
-}
-
-// Generar key
-function generateKey() {
-
-  const chars =
-    "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-
-  let value = "";
-
-  for (let i = 0; i < 6; i++) {
-    value += chars[
-      Math.floor(Math.random() * chars.length)
-    ];
-  }
-
-  return PREFIX + value;
-}
-
-const today = getToday();
-
-let saved = null;
-
-try {
-  saved = JSON.parse(
-    localStorage.getItem(STORAGE_NAME) || "null"
-  );
-} catch (e) {
-  saved = null;
-}
-
-let key;
-
-// Si todavía es el mismo día, conservar la key
-if (
-  saved &&
-  saved.date === today &&
-  saved.key
-) {
-
-  key = saved.key;
-
-} else {
-
-  // Nuevo día = nueva key
-  key = generateKey();
-
-  localStorage.setItem(
-    STORAGE_NAME,
-    JSON.stringify({
-      date: today,
-      key: key
-    })
-  );
-}
-
-// Mostrar key
-document.getElementById("key").textContent = key;
+  </main>
 
 
-// Botón copiar
-document.getElementById("copyKey").addEventListener(
-  "click",
-  async function () {
+  <script>
 
-    try {
+    // API DE ZRUSSO
+    const API_URL =
+      "https://zrusso-key-api.miguelpardo1555.workers.dev/generate";
 
-      await navigator.clipboard.writeText(key);
 
-      this.textContent = "✅ KEY COPIADA";
+    const loading = document.getElementById("loading");
+    const keyElement = document.getElementById("key");
+    const copyButton = document.getElementById("copy");
+    const status = document.getElementById("status");
 
-      setTimeout(() => {
-        this.textContent = "COPIAR KEY";
-      }, 1500);
 
-    } catch (error) {
+    // SOLICITAR UNA KEY AL SERVIDOR
+    async function generateKey() {
 
-      alert("Copia esta key: " + key);
+      try {
 
+        const response = await fetch(API_URL);
+
+        if (!response.ok) {
+          throw new Error("Error HTTP " + response.status);
+        }
+
+        const data = await response.json();
+
+
+        if (!data.success || !data.key) {
+          throw new Error("La API no devolvió una key.");
+        }
+
+
+        // Mostrar key
+        keyElement.textContent = data.key;
+
+        loading.style.display = "none";
+        keyElement.style.display = "inline-block";
+        copyButton.style.display = "block";
+
+        status.textContent =
+          "Tu key es válida durante 24 horas.";
+
+
+      } catch (error) {
+
+        loading.textContent =
+          "No se pudo generar la key.";
+
+        loading.classList.add("error");
+
+        status.textContent =
+          "Intenta nuevamente en unos segundos.";
+
+        console.error(error);
+      }
     }
 
-  }
-);
 
-</script>
+    // COPIAR KEY
+    copyButton.addEventListener("click", async function () {
+
+      const key = keyElement.textContent;
+
+      try {
+
+        await navigator.clipboard.writeText(key);
+
+        copyButton.textContent = "✓ KEY COPIADA";
+
+        setTimeout(function () {
+          copyButton.textContent = "COPIAR KEY";
+        }, 2000);
+
+      } catch (error) {
+
+        // Alternativa para navegadores que no permiten clipboard
+        const textArea = document.createElement("textarea");
+
+        textArea.value = key;
+        document.body.appendChild(textArea);
+
+        textArea.select();
+
+        document.execCommand("copy");
+
+        textArea.remove();
+
+        copyButton.textContent = "✓ KEY COPIADA";
+
+        setTimeout(function () {
+          copyButton.textContent = "COPIAR KEY";
+        }, 2000);
+      }
+
+    });
+
+
+    // INICIAR
+    generateKey();
+
+  </script>
 
 </body>
 </html>
